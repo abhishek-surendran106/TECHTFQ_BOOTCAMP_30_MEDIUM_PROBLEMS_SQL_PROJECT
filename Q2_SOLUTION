@@ -1,0 +1,7 @@
+with main as
+(select * from (
+		select e.id, e.salary, d.department, rank() over (partition by d.department order by e.salary desc) as rnk 
+        from db_employee e join db_dept d on e.department_id = d.id) as temp
+        where rnk = 1 and department in ("marketing", "engineering"))
+select max(case when department = "marketing" then salary end) -
+max(case when department = "engineering" then salary end) as diff_sal from main;
