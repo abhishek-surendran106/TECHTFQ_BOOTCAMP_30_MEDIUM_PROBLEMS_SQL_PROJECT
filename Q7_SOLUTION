@@ -1,0 +1,10 @@
+-- 1
+select t1.team_name as team_A, t2.team_name as team_B from teams t1
+cross join teams t2 on t1.team_code != t2.team_code
+order by team_A, team_B;
+
+-- 2
+select t1.team_name as team_A, t2.team_name as team_B from teams t1
+cross join teams t2 on t1.team_code != t2.team_code
+where t1.team_name < t2.team_name
+order by team_A, team_B;
