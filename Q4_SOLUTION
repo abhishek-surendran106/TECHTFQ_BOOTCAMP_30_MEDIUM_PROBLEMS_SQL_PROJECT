@@ -1,0 +1,15 @@
+with base as
+(select user_id,
+created_at, 
+row_number() over (partition by user_id order by created_at) as rn, 
+lead(created_at) over (partition by user_id) as nxt_pur
+from amazon_transactions
+where user_id in (select user_id from (
+select user_id, count(*) as num_of_purchases from amazon_transactions
+group by user_id
+having count(*) >1
+order by 2 desc) as temp)),
+final as
+(select *, datediff(nxt_pur, created_at) as flag from base
+having datediff(nxt_pur, created_at) <=7)
+select distinct user_id from final;
