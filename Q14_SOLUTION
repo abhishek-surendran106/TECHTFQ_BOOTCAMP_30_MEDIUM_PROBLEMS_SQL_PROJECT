@@ -1,0 +1,4 @@
+SELECT 
+  * FROM input_val v1
+JOIN input_val v2 ON v1.val != v2.val
+JOIN input_val v3 ON v1.val != v3.val AND v2.val != v3.val;
