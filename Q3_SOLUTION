@@ -1,0 +1,36 @@
+WITH ebs_data AS (
+    SELECT department, grade, salary
+    FROM employee_info
+    WHERE department = 'EBS'
+),
+marketing_data AS (
+    SELECT department, grade, salary
+    FROM employee_info
+    WHERE department = 'Marketing'
+),
+all_dept_data AS (
+    SELECT 'All Departments' AS department, grade, SUM(salary) AS salary
+    FROM employee_info
+    GROUP BY grade
+)
+SELECT * FROM ebs_data
+UNION ALL
+SELECT department, 'All Grades', SUM(salary)
+FROM ebs_data
+GROUP BY department, 'All Grades'
+
+UNION ALL
+
+SELECT * FROM marketing_data
+UNION ALL
+SELECT department, 'All Grades', SUM(salary)
+FROM marketing_data
+GROUP BY department, 'All Grades'
+
+UNION ALL
+
+SELECT * FROM all_dept_data
+UNION ALL
+SELECT department, 'All Grades', SUM(salary)
+FROM all_dept_data
+GROUP BY department, 'All Grades';
