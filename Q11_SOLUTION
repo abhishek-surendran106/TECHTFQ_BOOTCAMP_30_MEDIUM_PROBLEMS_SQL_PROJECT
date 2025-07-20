@@ -1,0 +1,7 @@
+select first_name, total_cost, order_date from 
+(select o.order_date, c.first_name, count(o.id) as number_of_orders, sum(o.total_order_cost) as total_cost, 
+rank() over (order by count(o.id) desc,sum(o.total_order_cost)desc) as rnk  from orders o
+left join customers c on o.cust_id = c.id
+group by o.order_date, c.first_name
+order by 3 desc, 4 desc) as temp
+where rnk =1;
