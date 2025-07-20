@@ -1,0 +1,6 @@
+select *, round((current_year_host - prev_year_host)*100/prev_year_host) as estimated_growth from
+(select *, lag(current_year_host) over (order by year) as prev_year_host from
+(select year(host_since) as year, count(id) as current_year_host
+from airbnb_search_details
+group by 1
+order by 1) as temp) as temp2;
