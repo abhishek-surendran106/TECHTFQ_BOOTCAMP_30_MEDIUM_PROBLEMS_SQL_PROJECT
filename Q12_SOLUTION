@@ -1,0 +1,19 @@
+select * from cust_orders;
+SELECT
+    cust_name,
+    CASE
+        -- Rule 1: COMPLETED - All orders are DELIVERED
+        WHEN COUNT(CASE WHEN status = 'DELIVERED' THEN 1 END) = COUNT(*) THEN 'COMPLETED'
+        -- Rule 2: IN PROGRESS - Some DELIVERED, some not DELIVERED
+        WHEN COUNT(CASE WHEN status = 'DELIVERED' THEN 1 END) > 0 AND COUNT(CASE WHEN status != 'DELIVERED' THEN 1 END) > 0 THEN 'IN PROGRESS'
+        -- Rule 3: AWAITING PROGRESS - All orders are SUBMITTED (and no DELIVERED orders, covered by previous conditions)
+        WHEN COUNT(CASE WHEN status = 'SUBMITTED' THEN 1 END) = COUNT(*) THEN 'AWAITING PROGRESS'
+        -- Rule 4: AWAITING SUBMISSION - Otherwise (e.g., all CREATED, or mixed CREATED/SUBMITTED without DELIVERED)
+        ELSE 'AWAITING SUBMISSION'
+    END AS Final_Status
+FROM
+    cust_orders
+GROUP BY
+    cust_name
+ORDER BY
+    cust_name;
