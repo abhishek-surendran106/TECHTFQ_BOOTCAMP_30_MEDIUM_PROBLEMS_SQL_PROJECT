@@ -1,0 +1,14 @@
+WITH mark_groups AS (
+  SELECT *,
+         SUM(CASE WHEN job_role IS NOT NULL THEN 1 ELSE 0 END)
+         OVER (ORDER BY row_id) AS grp
+  FROM job_skills
+),
+fill_roles AS (
+  SELECT mg.row_id,
+         MAX(js.job_role) OVER (PARTITION BY mg.grp) AS job_role,
+         mg.skills
+  FROM mark_groups mg
+  LEFT JOIN job_skills js ON js.row_id = mg.row_id
+)
+SELECT * FROM fill_roles;
