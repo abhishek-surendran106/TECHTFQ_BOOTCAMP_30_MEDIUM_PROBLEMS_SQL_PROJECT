@@ -1,0 +1,28 @@
+WITH sent_requests AS (
+  SELECT user_id_sender, user_id_receiver, date AS sent_date
+  FROM fb_friend_requests
+  WHERE action = 'sent'
+),
+accepted_requests AS (
+  SELECT user_id_sender, user_id_receiver
+  FROM fb_friend_requests
+  WHERE action = 'accepted'
+),
+tagged AS (
+  SELECT 
+    s.sent_date,
+    CASE 
+      WHEN a.user_id_sender IS NOT NULL THEN 1
+      ELSE 0
+    END AS is_accepted
+  FROM sent_requests s
+  LEFT JOIN accepted_requests a
+    ON s.user_id_sender = a.user_id_sender
+   AND s.user_id_receiver = a.user_id_receiver
+)
+SELECT 
+  sent_date AS date,
+  ROUND(SUM(is_accepted) * 1.0 / COUNT(*), 9) AS percent_acceptance
+FROM tagged
+GROUP BY sent_date
+ORDER BY sent_date;
