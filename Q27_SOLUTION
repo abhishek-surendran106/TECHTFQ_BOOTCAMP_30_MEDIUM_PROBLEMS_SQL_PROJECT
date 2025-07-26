@@ -1,0 +1,24 @@
+WITH summary AS (
+    SELECT 
+        CONCAT(ct.first_name, ' ', ct.last_name) AS candidate_name, 
+        temp.state, 
+        temp.wins
+    FROM (
+        SELECT candidate_id, state, COUNT(*) AS wins
+        FROM results_tab
+        GROUP BY candidate_id, state
+    ) AS temp
+    JOIN candidates_tab ct ON ct.id = temp.candidate_id
+),
+ranking AS (
+    SELECT *, DENSE_RANK() OVER (PARTITION BY candidate_name ORDER BY wins DESC) AS rnk 
+    FROM summary
+)
+SELECT 
+    candidate_name,
+    GROUP_CONCAT(CASE WHEN rnk = 1 THEN CONCAT(state, ' (', wins, ')') END ORDER BY state) AS 1st_place,
+    GROUP_CONCAT(CASE WHEN rnk = 2 THEN CONCAT(state, ' (', wins, ')') END ORDER BY state) AS 2nd_place,
+    GROUP_CONCAT(CASE WHEN rnk = 3 THEN CONCAT(state, ' (', wins, ')') END ORDER BY state) AS 3rd_place
+FROM ranking
+WHERE rnk <= 3
+GROUP BY candidate_name;
