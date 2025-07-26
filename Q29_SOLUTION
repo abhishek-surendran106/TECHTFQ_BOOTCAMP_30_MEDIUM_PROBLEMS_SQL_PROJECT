@@ -1,0 +1,10 @@
+with base as
+(select * from 
+(select *, rank() over (partition by username order by startDate desc) as rnk from useractivity) as temp
+where rnk <=2),
+final as
+(select username, activity, startdate, enddate, rank() over (partition by username order by startdate) as rnk2
+from base)
+select username, activity, startdate, enddate
+from final
+where rnk2 = 1;
