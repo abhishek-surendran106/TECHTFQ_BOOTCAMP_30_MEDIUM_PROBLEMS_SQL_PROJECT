@@ -1,0 +1,9 @@
+with cte_1 as
+(select u.name, p.post_id, p.post_date, p.content, p.likes, p.shares, count(c.comments) as number_of_comments from posts p
+left join comments c on p.post_id = c.post_id
+left join users u on p.user_id = u.user_id
+group by 1,2,3,4,5,6),
+viral_prediction as
+(select *, likes+shares+number_of_comments as total_engagement, rank() over (order by likes+shares+number_of_comments desc) as rnk from cte_1)
+select post_id, name as author, total_engagement from viral_prediction
+where rnk<=3;
