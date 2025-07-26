@@ -1,0 +1,17 @@
+WITH holiday_only AS (
+  SELECT day
+  FROM calendar
+  WHERE holiday = TRUE
+),
+marked_consecutive AS (
+  SELECT 
+    day,
+    LAG(day) OVER (ORDER BY day) AS prev_day,
+    LEAD(day) OVER (ORDER BY day) AS next_day
+  FROM holiday_only
+)
+SELECT day
+FROM marked_consecutive
+WHERE 
+  DATEDIFF(day, prev_day) = 1 OR 
+  DATEDIFF(next_day, day) = 1;
