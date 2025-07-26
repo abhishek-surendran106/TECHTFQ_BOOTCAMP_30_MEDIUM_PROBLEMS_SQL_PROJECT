@@ -1,0 +1,12 @@
+with most_votes as
+(select constituency_id, max(votes) as most_votes from results
+group by constituency_id),
+filtered as
+(select r.candidate_id, r.constituency_id, r.votes, c.id, c.party from most_votes mv
+left join results r on mv.most_votes = r.votes
+left join candidates c on r.candidate_id = c.id),
+final as
+(select party, count(*) as seats, concat(party, " ",count(*)) as seats_won
+from filtered
+group by party)
+select seats_won as party_seats_won from final;
