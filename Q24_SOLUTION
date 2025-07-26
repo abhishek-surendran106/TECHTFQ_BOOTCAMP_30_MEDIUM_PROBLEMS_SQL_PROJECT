@@ -1,0 +1,11 @@
+with total_transactions as
+(select user_id, count(*) as tot_tnx from transactions
+group by user_id
+having count(*) > 5),
+failed_txn as
+(select user_id, count(*) as failed_txn from transactions
+where status = "failed"
+group by user_id)
+select ft.user_id, u.name, tt.tot_tnx, ft.failed_txn from failed_txn ft
+join total_transactions tt on ft.user_id = tt.user_id
+join users u on ft.user_id = u.user_id;
