@@ -1,0 +1,9 @@
+with sum_cum as
+(select *, sum(transaction_amount) over (partition by account_no order by transaction_date) as cum from account_balance),
+final as
+(select account_no,
+min(case when cum >= 1000 then transaction_date else null end) as transaction_date
+from sum_cum
+group by account_no)
+select * from final
+where transaction_date is not null;
