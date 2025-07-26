@@ -1,0 +1,13 @@
+with scheduled_patients as
+(select distinct patient_id from appointments 
+where status = "scheduled"),
+missed_appointments as
+(select patient_id, count(status) as number_of_appointments_missed from appointments
+where status = "missed"
+and appointment_date <= date_sub(now(), interval 5 month)
+group by patient_id
+having number_of_appointments_missed >= 3)
+select ma.patient_id, p.name, ma.number_of_appointments_missed as missed_count, a.appointment_date as next_appointment from missed_appointments ma
+left join patients p on ma.patient_id = p.patient_id
+left join appointments a on ma.patient_id = a.patient_id
+where status = "scheduled";
