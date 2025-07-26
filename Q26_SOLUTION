@@ -1,0 +1,32 @@
+with successful_camp as
+(select top_performers, success_events from 
+(select c.customer_id as top_performers, count(*) as success_events, rank() over (order by count(*) desc) as success_rank from campaigns c
+join events e on c.id = e.campaign_id
+where status = "Success"
+group by c.customer_id) as temp
+where success_rank = 1),
+success_details as
+(select distinct e.status as event_type, concat(c.first_name, " ", c.last_name) as customer, group_concat(distinct cm.name) as campaign, sc.success_events as total from successful_camp sc
+left join  customers c on c.id = sc.top_performers
+left join campaigns cm on sc.top_performers = cm.customer_id
+left join events e on cm.id = e.campaign_id
+where e.status = "Success"
+group by 1,2,4)
+select * from success_details
+union all
+select * from 
+(with failure_camp as
+(select poor_performers, failed_events from 
+(select c.customer_id as poor_performers, count(*) as failed_events, rank() over (order by count(*) desc) as failed_rank from campaigns c
+join events e on c.id = e.campaign_id
+where status = "Failure"
+group by c.customer_id) as temp
+where failed_rank = 1),
+failed_details as
+(select distinct e.status as event_type, concat(c.first_name, " ", c.last_name) as customer, group_concat(distinct cm.name) as campaign, sc.failed_events as total from failure_camp sc
+left join  customers c on c.id = sc.poor_performers
+left join campaigns cm on sc.poor_performers = cm.customer_id
+left join events e on cm.id = e.campaign_id
+where e.status = "Failure"
+group by 1,2,4)
+select * from failed_details) as tempo;
