@@ -1,0 +1,26 @@
+select case 
+	when balls between 1 and 6 then 1
+    when balls between 7 and 12 then 2
+    when balls between 13 and 18 then 3
+    when balls between 19 and 24 then 4
+    when balls between 25 and 30 then 5
+    when balls between 31 and 36 then 6
+    when balls between 37 and 42 then 7
+    when balls between 43 and 48 then 8
+    when balls between 49 and 54 then 9
+    when balls between 55 and 60 then 10
+    when balls between 61 and 66 then 11
+    when balls between 67 and 72 then 12
+    when balls between 73 and 78 then 13
+    when balls between 79 and 84 then 14
+    when balls between 85 and 90 then 15
+    when balls between 91 and 96 then 16
+    when balls between 97 and 102 then 17
+    when balls between 103 and 108 then 18
+    when balls between 109 and 114 then 19
+    when balls between 115 and 120 then 20
+    else 4 end as overs, sum(runs) as runs_per_over
+from match_score
+group by 1;
+
+
