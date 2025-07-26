@@ -1,0 +1,20 @@
+WITH cte AS (
+  SELECT *,
+    semester
+    - ROW_NUMBER() OVER (PARTITION BY student_id, result ORDER BY semester) AS diff_grp
+  FROM student_result
+)
+SELECT DISTINCT
+  student_id,
+  CONCAT(
+    FIRST_VALUE(semester) OVER (PARTITION BY student_id, result, diff_grp ORDER BY semester),
+    '-',
+    LAST_VALUE(semester) OVER (PARTITION BY student_id, result, diff_grp
+      ORDER BY semester
+      RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+    )
+  ) AS semester_range,
+  result,
+  COUNT(*) OVER (PARTITION BY student_id, result, diff_grp) AS consecutive_count
+FROM cte
+ORDER BY student_id, semester_range;
